@@ -5,9 +5,32 @@
 
 <h1>Select a container to view</h1>
 
-<select>
-    <option value="c1">container1</option>
-    <option value="c2">container2</option>
-    <option value="c3">container3</option>
-    <option value="c4">container4</option>
+<select id="container-select">
+    <option value="">Select a container...</option>
+    @{ 
+        List<Container> containers = (List<Container>) ViewData["Containers"];
+        foreach(var container in containers)
+        {
+            @: <option value="@container.reference">@container.metaData.title</option>
+        }
+    };
 </select>
+
+
+<div class="row">
+    <div class="col-8">
+        <div id="files" class="border-right">
+
+
+
+        </div>
+
+    </div>
+
+    <div class="col-4">
+        <div id="selected">
+            <button class="btn-sm btm-secondary" type="button" id="submit-files">Generate jupyter notebook file</button>
+        </div>
+    </div>
+</div>
+

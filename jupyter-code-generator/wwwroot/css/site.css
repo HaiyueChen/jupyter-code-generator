@@ -54,3 +54,26 @@ body {
   height: 60px;
   line-height: 60px; /* Vertically center the text there */
 }
+
+
+.file {
+    padding: 2px;
+    margin: 5px;
+    border-bottom: 1px solid;
+}
+
+.file:hover {
+    background-color: ActiveBorder;
+    cursor: pointer;
+}
+
+.selected-file:hover {
+    background-color: ActiveBorder;
+    cursor: pointer;
+}
+
+.file-name {
+    padding: 0px;
+    margin-bottom: 2px;
+    
+}

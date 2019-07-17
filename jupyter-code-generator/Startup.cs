@@ -14,7 +14,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Logging;
+using System.Diagnostics;
 using static jupyter_code_generator.AzureAdB2CAuthenticationBuilderExtensions;
+using System.Net.Http;
+using jupyter_code_generator.Repositories;
 
 namespace jupyter_code_generator
 {
@@ -27,7 +30,7 @@ namespace jupyter_code_generator
 
         public IConfiguration Configuration { get; }
         public static Dictionary<string, string> userTokenCache = new Dictionary<string, string>();
-        public static string serverState = Guid.NewGuid().ToString();
+        public static readonly string serverState = Guid.NewGuid().ToString();
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -64,6 +67,9 @@ namespace jupyter_code_generator
             //AzureB2C configuration
             services.Configure<AzureAdB2COptions>(Configuration.GetSection("Authentication"));
             services.AddSingleton<IConfigureOptions<OpenIdConnectOptions>, OpenIdConnectOptionsSetup>();
+            services.AddTransient<HttpClient>();
+            services.AddTransient<DataApiRepo>();
+            services.AddTransient<AzureblobStorageRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

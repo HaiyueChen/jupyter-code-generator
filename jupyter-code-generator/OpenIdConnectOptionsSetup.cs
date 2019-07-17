@@ -13,6 +13,7 @@ using jupyter_code_generator.Models;
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
+using System.Diagnostics;
 
 namespace jupyter_code_generator
 {
@@ -120,16 +121,14 @@ namespace jupyter_code_generator
                     AuthenticationResult result = await cca.AcquireTokenByAuthorizationCode(AzureAdB2COptions.DataApiScope.Split(' '), authorization_code)
                         .ExecuteAsync();
 
-                    
                     context.HandleCodeRedemption(result.AccessToken, result.IdToken);
-                    //var accounts = await cca.GetAccountsAsync();
                     Startup.userTokenCache[signedInUserID] = result.AccessToken;
+                    Debug.WriteLine(result.AccessToken + "\n\n\n\n", "\n\n\n\nAccess Token\n\t");
                 }
                 catch (Exception ex)
                 {
-                    //TODO: Handle
-                    Console.WriteLine(ex);
-
+                    //TODO: 
+                    Debug.WriteLine(ex.ToString() + "\n\n\n\n", "\n\n\n\nFetch access token failed\n\t");
                     throw;
                 }
             }

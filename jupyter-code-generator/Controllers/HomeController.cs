@@ -14,43 +14,46 @@ using System.Net.Http;
 using System.Net;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
-using System.Web;
+using System.Diagnostics;
+using jupyter_code_generator.Repositories;
 
 namespace jupyter_code_generator.Controllers
 {
     public class HomeController : Controller
     {
 
-
-        public HomeController(IOptions<AzureAdB2COptions> azureAdB2COptionsInjection)
+        private DataApiRepo _dataApiRepo;
+        public HomeController(DataApiRepo dataApiRepoInjection)
         {
-            this.azureAdB2COptions = azureAdB2COptionsInjection.Value;
+            this._dataApiRepo = dataApiRepoInjection;
         }
 
-        public AzureAdB2COptions azureAdB2COptions { get; set; }
-
-
         public IActionResult Index()
-        {
-            var scope = azureAdB2COptions.DataApiScope;
-
-            
-            //IConfidentialClientApplication cca =
-            //    ConfidentialClientApplicationBuilder.Create(azureAdB2COptions.ClientId)
-            //                                        .WithRedirectUri(azureAdB2COptions.RedirectUri)
-            //                                        .WithClientSecret(azureAdB2COptions.ClientSecret)
-            //                                        .WithB2CAuthority(azureAdB2COptions.Authority)
-            //                                        .Build();
-            var cache = Startup.userTokenCache;
-            
+        {      
             return View();
         }
 
 
         [Authorize]
-        public IActionResult Container()
+        public async Task<IActionResult> Container()
         {
+            ISession clientSession = HttpContext.Session;
+            if (SessionStateInvalid(clientSession))
+            {
+                clientSession.Clear();
+                clientSession.SetString("state", Startup.serverState);
+                return RedirectToAction("signIn", "Session");
+            }
 
+            var userId = HttpContext.User.Claims.FirstOrDefault(itt => itt.Type == "userId").Value;
+            string accessToken = Startup.userTokenCache[userId];
+
+            List<Container> containers = await _dataApiRepo.GetContainers(accessToken);
+            containers.ForEach(c =>
+           {
+               Debug.WriteLine(c.ToString());
+           });
+            ViewData["containers"] = containers;
             return View();
         }
 
